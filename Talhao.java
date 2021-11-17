@@ -1,5 +1,6 @@
 package aep_projeto;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Talhao {
     private int codigoTalhao;
@@ -11,6 +12,8 @@ public class Talhao {
     private ArrayList<String> culturas = new ArrayList<>();
     private ArrayList<Dispositivos> dispositivos = new ArrayList<>(); 
     private ArrayList<Drone> drones = new ArrayList<>();
+    private ArrayList<Fertilizante> listaFertilizantes = new ArrayList<>();
+    private ArrayList<Agrotoxico> listaAgrotoxicos = new ArrayList<>();
     
 //    CONSTRUTOR E MÉTODOS BÁSICOS DA CLASSE "TALHAO"
     
@@ -183,6 +186,88 @@ public class Talhao {
         if(count != -1){
             throw new RuntimeException("Drone não cadastrado no sistema, verifique o código!");
         }
+    }
+    
+    //RELACIONAMENTO SUBSTANCIAS X TALHAO
+    
+    public void addFertilizante(int codigoFertilizante, String descricaoFertilizante, String organicidade, String unidade){
+        for(Fertilizante fertilizante : listaFertilizantes){
+            if(fertilizante.getCodigo() == codigoFertilizante){
+                throw new RuntimeException("Este código já existe cadastrado para outro fertilizante!");
+            }
+        }
+        listaFertilizantes.add(new Fertilizante(codigoFertilizante, descricaoFertilizante, organicidade, unidade));
+    }
+    
+    public void addAgrotoxico(int codigoToxico, String descricaoToxico, String tipoToxico, double taxaDL50, String classeToxico, String unidade){
+        for(Agrotoxico agrotoxico : listaAgrotoxicos){
+            if(agrotoxico.getCodigo() == codigoToxico){
+                throw new RuntimeException("Este código já existe cadastrado para outro agrotóxico!");
+            }
+        }
+        listaAgrotoxicos.add(new Agrotoxico(codigoToxico, taxaDL50, descricaoToxico, tipoToxico, unidade));
+    }
+    
+    public Fertilizante getFertilizante(int codigoFertilizante){
+        for(Fertilizante fertilizante : listaFertilizantes){
+            if(fertilizante.getCodigo() == codigoFertilizante){
+                return fertilizante;
+            }
+        }
+        throw new RuntimeException("Não existe fertilizante cadastrado com este código!");
+    }
+    
+    public Agrotoxico getAgrotoxico(int codigoAgrotoxico){
+        for(Agrotoxico agrotoxico : listaAgrotoxicos){
+            if(agrotoxico.getCodigo() == codigoAgrotoxico){
+                return agrotoxico;
+            }
+        }
+        throw new RuntimeException("Não existe agrótixco cadastrado com este código!");
+    }
+    
+    public String calculaEfetividadeGeralFertilizantes(int ano){
+        double somatoriaPorcentagensMes = 0;
+        double mediaPorcentagemMes = 0;
+        String tabelaEfeitivdadeGeralFertilizantes = "";
+        
+        for(int mes = 1; mes <= 12; mes++){
+            int fertilizantesAplicados = 0;
+            for(Fertilizante fertilizante : listaFertilizantes){
+                somatoriaPorcentagensMes = somatoriaPorcentagensMes + fertilizante.getTaxaEconomia(mes, ano);
+                fertilizantesAplicados++;
+            }
+            if(fertilizantesAplicados > 0){
+                mediaPorcentagemMes = somatoriaPorcentagensMes / fertilizantesAplicados;
+                tabelaEfeitivdadeGeralFertilizantes = mes + "/" + ano + " - " + mediaPorcentagemMes; 
+            }else{
+                tabelaEfeitivdadeGeralFertilizantes = mes + "/" + ano + " - " + "Não há registro de aplicação"; 
+            } 
+        }
+        
+        return tabelaEfeitivdadeGeralFertilizantes;
+    }
+    
+    public String calculaEfetividadeGeralAgrotoxico(int ano){
+        double somatoriaPorcentagensMes = 0;
+        double mediaPorcentagemMes = 0;
+        String tabelaEfeitivdadeGeralAgrotoxico= "";
+        
+        for(int mes = 1; mes <= 12; mes++){
+            int agrotoxicosAplicados = 0;
+            for(Agrotoxico agrotoxico : listaAgrotoxicos){
+                somatoriaPorcentagensMes = somatoriaPorcentagensMes + agrotoxico.getTaxaEconomia(mes, ano);
+                agrotoxicosAplicados++;
+            }
+            if(agrotoxicosAplicados > 0){
+                mediaPorcentagemMes = somatoriaPorcentagensMes / agrotoxicosAplicados;
+                tabelaEfeitivdadeGeralAgrotoxico += mes + "/" + ano + " - " + mediaPorcentagemMes + "/"; 
+            }else{
+                tabelaEfeitivdadeGeralAgrotoxico += mes + "/" + ano + " - " + "Não há registro de aplicação"; 
+            } 
+        }
+        
+        return tabelaEfeitivdadeGeralAgrotoxico;
     }
     
 }
